@@ -46,30 +46,45 @@ namespace ProjectEuler69
 
         static void Main(string[] args)
         {
-            Dictionary<int, int> Totients = new Dictionary<int, int>();
+            SortedDictionary<int, int> Totients = new SortedDictionary<int, int>();
             List<long> Factors;
-      
+
+            System.Diagnostics.Stopwatch Timer = new System.Diagnostics.Stopwatch();
+            Timer.Start();
+
             const int max = 1000000;
             Factors = GetPrimes(max);
 
-            long numer, denom;
-            int j;
+            long x, p, accum;
+            int j, n = Factors.Count();
+            double longest;
 
-            for (int i = 2; i <= max; i++)
+            foreach (long a in Factors) Totients.Add((int)a, (int)a - 1);
+
+            for (int i = max; i >= 2; i--)
             {
-                numer = 1;
-                j = 0;
-                while (Factors[j] < i) if (i % Factors[++j] == 0) numer *= Factors[j - 1] - 1;
-                
-                denom= 1;
-                j = 0;
-                while (Factors[j] < i) if (i % Factors[++j] == 0) denom *= Factors[j - 1];
+                if (Factors.BinarySearch(i) >= 0) continue;
+                x = i;
+                accum = 1;
+                for (j = 0; j < n; j++)
+                {
+                    p = Factors[j];
+                    if (x==1) break;
+                    if (x % p != 0) continue;
+                    accum *= Totients[(int)p];
+                    x /= p;
+                    while (x % p == 0)
+                    {
+                        accum *= p;
+                        x /= p;
+                    }
+                }
 
-                Totients.Add(i, (int)(((long)i * numer) / denom));
-                if(i%1000==0)Console.WriteLine(i);
+                Totients.Add(i, (int)accum);
             }
-            foreach (KeyValuePair<int, int> x in Totients)
-                Console.WriteLine(x.Key + " " + x.Value);
+            longest = Totients.Select(s => (double)s.Key / (double)s.Value).Max();
+            Console.WriteLine(Totients.Where(s => (double)s.Key / (double)s.Value == longest).Select(s => s.Key).First());
+            Console.WriteLine(Timer.ElapsedMilliseconds);
         }
     }
 }
