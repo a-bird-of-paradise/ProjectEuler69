@@ -53,11 +53,17 @@ namespace ProjectEuler69
             Factors = GetPrimes(max);
 
             long numer, denom;
+            int j;
 
             for (int i = 2; i <= max; i++)
             {
-                numer = Factors.Where(x => i >= x && i % x == 0).Select(s => s - 1).Aggregate((x, y) => x * y);
-                denom = Factors.Where(x => i >= x && i % x == 0).Aggregate((x, y) => x * y);
+                numer = 1;
+                j = 0;
+                while (Factors[j] < i) if (i % Factors[++j] == 0) numer *= Factors[j - 1] - 1;
+                
+                denom= 1;
+                j = 0;
+                while (Factors[j] < i) if (i % Factors[++j] == 0) denom *= Factors[j - 1];
 
                 Totients.Add(i, (int)(((long)i * numer) / denom));
                 if(i%1000==0)Console.WriteLine(i);
